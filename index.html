@@ -140,6 +140,14 @@
   .kpi{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; box-shadow:var(--shadow);}
   .kpi .val{font-size:22px; font-weight:800; color:var(--blue);}
   .kpi .lbl{font-size:11.5px; color:var(--muted); margin-top:2px;}
+  .kpi.manual .val-input{
+    width:100%; border:1px solid var(--line); border-radius:7px; padding:4px 6px;
+    font-size:20px; font-weight:800; color:var(--blue-dark); background:#f7f9fc;
+  }
+  .kpi.manual .lbl{display:flex; align-items:center; gap:5px;}
+  .kpi.manual .lbl .tag-manual{
+    font-size:9px; font-weight:700; color:#a06a00; background:#fff3b0; border-radius:4px; padding:1px 5px;
+  }
 
   .route-block{margin-bottom:22px;}
   .route-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; flex-wrap:wrap; gap:8px;}
@@ -205,7 +213,7 @@
   <!-- ---------- DASHBOARD (Depot Summary) ---------- -->
   <div class="page active" id="page-dashboard">
     <h2 class="section-title">TGSRTC Karimnagar Depot-2 — Depot Summary</h2>
-    <div class="section-sub">Every figure below is computed automatically from the <b>Route Summary</b> tab (which itself is pulled from the DOR sheet) for the selected date — as soon as a DOR entry is logged, it rolls up here by Model, Shift, and Route. Nothing on this page is edited by hand.</div>
+    <div class="section-sub">Most figures below are computed automatically from the <b>Route Summary</b> tab (which itself is pulled from the DOR sheet) for the selected date — as soon as a DOR entry is logged, it rolls up here by Model, Shift, and Route. Total Fleet is a fixed value; Breakdown/Accident report counts are typed in manually for now.</div>
 
     <div class="kpis" id="kpiRow"></div>
 
@@ -398,6 +406,22 @@ function dmyToIso(s){
 function num(v){ const n = Number(v); return isNaN(n) ? 0 : n; }
 function lossClass(loss){ return loss > 0 ? 'loss-pos' : 'loss-zero'; }
 
+/* ---------- Total Fleet: fixed value (not pulled from the sheet) ---------- */
+const FIXED_TOTAL_FLEET = 104;
+
+/* ---------- Manually-typed KPIs (Breakdown / Accident report counts) ----------
+   These aren't in the DOR sheet yet, so for now they're typed in directly on
+   the dashboard and kept per-date in this browser via localStorage. */
+function getManualKpi(key, dateKey){
+  try{
+    const raw = localStorage.getItem('chakra_kpi_' + key + '_' + dateKey);
+    return raw !== null ? raw : '';
+  }catch(e){ return ''; }
+}
+function setManualKpi(key, dateKey, value){
+  try{ localStorage.setItem('chakra_kpi_' + key + '_' + dateKey, value); }catch(e){}
+}
+
 /* ---------- shared "which date are we looking at" state ---------- */
 function getActiveDate(){
   const routesDate = document.getElementById('routesDate');
@@ -509,6 +533,7 @@ function renderDepot(){
     a.model.localeCompare(b.model) || a.route.localeCompare(b.route) || a.shift.localeCompare(b.shift));
 
   let totalFleet=0, totalSch=0, totalOps=0, totalSchKms=0, totalOprKms=0;
+  let totalTripsSch=0, totalTripsOps=0, totalTripsLoss=0, totalOdoKm=0, totalOdoDiff=0;
   const totalDrivers = new Set();
 
   let html = `<thead><tr>
@@ -528,6 +553,14 @@ function renderDepot(){
     totalFleet += buses.size; totalSch += sch; totalOps += ops;
     totalSchKms += schKms; totalOprKms += oprKms;
     drivers.forEach(d=>totalDrivers.add(d));
+
+    g.rows.forEach(r=>{
+      totalTripsSch += num(r['Schedule Trip']);
+      totalTripsOps += num(r['Actual Trip']);
+      totalTripsLoss += num(r['Miss Trip']);
+      totalOdoKm += num(r['Odometer  Diff. Km (B-A)']);
+      totalOdoDiff += num(r['Diffrence']);
+    });
 
     html += `<tr>
         <td class="name">${g.model}</td><td>${g.shift}</td><td>${g.route}</td>
@@ -549,14 +582,36 @@ function renderDepot(){
 
   document.getElementById('depotTable').innerHTML = rows.length ? html : '';
 
+  const dateKey = getActiveDate();
+  const breakdownVal = getManualKpi('breakdown', dateKey);
+  const accidentVal = getManualKpi('accident', dateKey);
+  const odoDiffColor = totalOdoDiff > 0 ? '#c0392b' : '#177a45';
+
   document.getElementById('kpiRow').innerHTML = `
-    <div class="kpi"><div class="val">${totalFleet}</div><div class="lbl">Total Fleet</div></div>
+    <div class="kpi"><div class="val">${FIXED_TOTAL_FLEET}</div><div class="lbl">Total Fleet</div></div>
     <div class="kpi"><div class="val">${totalSch}</div><div class="lbl">Scheduled Services</div></div>
     <div class="kpi"><div class="val">${totalOps}</div><div class="lbl">Operated Services</div></div>
+    <div class="kpi"><div class="val">${totalTripsOps.toLocaleString()}</div><div class="lbl">Operated Trips</div></div>
+    <div class="kpi"><div class="val" style="color:${totalTripsLoss>0?'#c0392b':'#177a45'}">${totalTripsLoss.toLocaleString()}</div><div class="lbl">Loss Trips</div></div>
     <div class="kpi"><div class="val">${totalSchKms.toLocaleString()}</div><div class="lbl">Scheduled KMs</div></div>
     <div class="kpi"><div class="val">${totalOprKms.toLocaleString()}</div><div class="lbl">Operated KMs</div></div>
     <div class="kpi"><div class="val" style="color:${totalLoss>0?'#c0392b':'#177a45'}">${totalLoss.toLocaleString()}</div><div class="lbl">Loss KMs</div></div>
+    <div class="kpi"><div class="val">${totalOdoKm.toLocaleString()}</div><div class="lbl">Odo KMs</div></div>
+    <div class="kpi"><div class="val" style="color:${odoDiffColor}">${totalOdoDiff.toLocaleString()}</div><div class="lbl">Actual vs Odo Diff.</div></div>
+    <div class="kpi manual">
+      <input type="number" min="0" class="val-input" id="kpiBreakdown" value="${breakdownVal}" placeholder="0">
+      <div class="lbl">Breakdown Reports <span class="tag-manual">manual</span></div>
+    </div>
+    <div class="kpi manual">
+      <input type="number" min="0" class="val-input" id="kpiAccident" value="${accidentVal}" placeholder="0">
+      <div class="lbl">Accident Reports <span class="tag-manual">manual</span></div>
+    </div>
   `;
+
+  const breakdownInput = document.getElementById('kpiBreakdown');
+  const accidentInput = document.getElementById('kpiAccident');
+  if(breakdownInput) breakdownInput.addEventListener('input', function(){ setManualKpi('breakdown', dateKey, this.value); });
+  if(accidentInput) accidentInput.addEventListener('input', function(){ setManualKpi('accident', dateKey, this.value); });
 }
 
 /* ==========================================================================
