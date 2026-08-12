@@ -159,6 +159,57 @@
   .sync-status.err{color:var(--red); font-weight:600;}
   .sync-status.busy{color:#a06a00; font-weight:600;}
 
+  /* ---------------- STAFF STRENGTH CARDS ---------------- */
+  .subhead{font-size:12px; font-weight:700; color:var(--blue-dark); text-transform:uppercase; letter-spacing:.04em; margin:2px 0 8px;}
+  .kpi.manual.staff .val-input{color:var(--green-dark); background:#f4faf6;}
+  .kpi.manual.staff .lbl .tag-manual{color:#146c43; background:#d9f2e3;}
+
+  /* ---------------- SPOTLIGHT (BIRTHDAY / LEAVE) FLIP CARD ---------------- */
+  .spotlight-row{display:grid; grid-template-columns:minmax(260px,1fr); gap:12px; margin-bottom:20px;}
+  @media(min-width:560px){ .spotlight-row{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));} }
+  .flip-card{perspective:1400px; height:150px;}
+  .flip-card-inner{
+    position:relative; width:100%; height:100%; text-align:left;
+    transition:transform .7s cubic-bezier(.4,.2,.2,1); transform-style:preserve-3d;
+    border-radius:12px; box-shadow:var(--shadow);
+  }
+  .flip-card.is-flipped .flip-card-inner{transform:rotateY(180deg);}
+  .flip-face{
+    position:absolute; inset:0; backface-visibility:hidden; border-radius:12px;
+    padding:14px 16px; overflow:hidden; display:flex; flex-direction:column;
+    border:1px solid var(--line);
+  }
+  .flip-face.flip-front{background:linear-gradient(135deg,#fff8de,#fff3b0);}
+  .flip-face.flip-back{background:linear-gradient(135deg,#e7edfb,#d9e4fb); transform:rotateY(180deg);}
+  .flip-face .flip-title{font-size:12.5px; font-weight:800; color:var(--blue-dark); display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:6px;}
+  .flip-face .flip-title .edit-btn{
+    background:rgba(255,255,255,.6); border:1px solid rgba(18,41,122,.15); color:var(--blue-dark);
+    border-radius:6px; padding:2px 8px; font-size:10.5px; font-weight:700; cursor:pointer;
+  }
+  .flip-face .flip-title .edit-btn:hover{background:#fff;}
+  .flip-face .flip-list{list-style:none; margin:0; padding:0; overflow-y:auto; flex:1; font-size:12.5px;}
+  .flip-face .flip-list li{padding:2px 0; font-weight:600; color:var(--text);}
+  .flip-face .flip-empty{color:var(--muted); font-size:12px; font-style:italic;}
+  .flip-dots{display:flex; gap:5px; margin-top:6px;}
+  .flip-dots span{width:6px; height:6px; border-radius:50%; background:rgba(18,41,122,.2);}
+  .flip-card.is-flipped .flip-dots span:first-child{background:rgba(18,41,122,.2);}
+  .flip-card.is-flipped .flip-dots span:last-child{background:var(--blue-dark);}
+  .flip-card:not(.is-flipped) .flip-dots span:first-child{background:var(--blue-dark);}
+
+  /* ---------------- MODEL COLOR CODING (Shift-wise Summary) ---------------- */
+  #depotTable td.name{vertical-align:middle;}
+  tr.model-superluxury td{background:#fff3b0;}
+  tr.model-delux td{background:#e7d6f7;}
+  tr.model-express td{background:#cfe0fb;}
+  tr.model-other td{background:#f1f1f1;}
+  tr.model-a td{background:#d7f2df;}
+  tr.model-b td{background:#ffe0cf;}
+  tr.model-c td{background:#f9d7e6;}
+  tr.model-d td{background:#dff2f2;}
+  tr.model-superluxury td.name{color:#7a5b00;}
+  tr.model-delux td.name{color:#5a2a8c;}
+  tr.model-express td.name{color:#12297a;}
+
   @media(max-width:720px){
     .login-card{margin:0 16px;}
     #loginScreen{justify-content:center;}
@@ -213,7 +264,41 @@
   <!-- ---------- DASHBOARD (Depot Summary) ---------- -->
   <div class="page active" id="page-dashboard">
     <h2 class="section-title">TGSRTC Karimnagar Depot-2 — Depot Summary</h2>
-    <div class="section-sub">Most figures below are computed automatically from the <b>Route Summary</b> tab (which itself is pulled from the DOR sheet) for the selected date — as soon as a DOR entry is logged, it rolls up here by Model, Shift, and Route. Total Fleet is a fixed value; Breakdown/Accident report counts are typed in manually for now.</div>
+    <div class="section-sub">Most figures below are computed automatically from the <b>Route Summary</b> tab (which itself is pulled from the DOR sheet) for the selected date — as soon as a DOR entry is logged, it rolls up here by Model, Shift, and Route. Total Fleet is a fixed value; Breakdown/Accident report counts, staff strength, and the leave list are typed in manually for now.</div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Fleet Composition — Bus Model vs Services</h3>
+        <span style="font-size:11.5px;color:var(--muted);">Fixed reference table</span>
+      </div>
+      <div class="card-body" style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th style="text-align:left;">Bus Model</th><th>Buses</th><th>Services</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="name">Super Luxury</td><td>40</td><td>80</td></tr>
+            <tr><td class="name">Deluxe</td><td>10</td><td>10</td></tr>
+            <tr><td class="name">Express JBS</td><td>14</td><td>28</td></tr>
+            <tr><td class="name">Express GDK</td><td>18</td><td>18</td></tr>
+            <tr><td class="name">Express KMR</td><td>6</td><td>6</td></tr>
+            <tr><td class="name">Express MNTY</td><td>4</td><td>4</td></tr>
+            <tr><td class="name">Express JGTL</td><td>4</td><td>4</td></tr>
+            <tr><td class="name">Express MNCL &amp; LXPT</td><td>4</td><td>4</td></tr>
+            <tr class="total-row"><td>Total Operated Buses / Services</td><td>100</td><td>154</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:10px; font-size:12px; color:var(--muted);">
+          <b>Total Buses: 104</b> &nbsp;(Operated: 100&nbsp;•&nbsp;Spare: 4)
+        </div>
+      </div>
+    </div>
+
+    <div class="subhead">Depot Staff Strength</div>
+    <div class="kpis" id="staffKpiRow"></div>
+
+    <div class="subhead">Today at the Depot</div>
+    <div class="spotlight-row" id="spotlightRow"></div>
 
     <div class="kpis" id="kpiRow"></div>
 
@@ -333,18 +418,18 @@ function parseDobToMonthDay(raw){
 async function checkBirthdaysToday(){
   const bar = document.getElementById('birthdayBar');
   const msgEl = document.getElementById('birthdayMsg');
-  if(!DRIVERS_SCRIPT_URL || DRIVERS_SCRIPT_URL.indexOf('PASTE_') === 0) return;
+
+  const drivers = await ensureDriversLoaded();
+  // Refresh the Depot Summary spotlight card now that the driver list (and
+  // its birthdays) is available, in case it rendered before this resolved.
+  renderSpotlight(getActiveDate());
+  if(!drivers.length) return;
 
   const today = new Date();
   const todayKey = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
   if(sessionStorage.getItem('chakra_bday_dismissed') === todayKey) return;
 
   try{
-    const res = await fetch(DRIVERS_SCRIPT_URL + '?action=list');
-    if(!res.ok) return;
-    const drivers = await res.json();
-    if(!Array.isArray(drivers)) return;
-
     const matches = drivers.filter(d=>{
       const dob = parseDobToMonthDay(d.dob);
       return dob && dob.month === (today.getMonth()+1) && dob.day === today.getDate();
@@ -406,6 +491,19 @@ function dmyToIso(s){
 function num(v){ const n = Number(v); return isNaN(n) ? 0 : n; }
 function lossClass(loss){ return loss > 0 ? 'loss-pos' : 'loss-zero'; }
 
+/* ---------- colour-code each Model group in the Shift-wise Summary table ---------- */
+function modelColorClass(model){
+  const m = String(model || '').toLowerCase();
+  if(m.includes('super')) return 'model-superluxury';
+  if(m.includes('delux')) return 'model-delux';
+  if(m.includes('express')) return 'model-express';
+  if(m.includes('unclass') || !m.trim()) return 'model-other';
+  const palette = ['model-a','model-b','model-c','model-d'];
+  let hash = 0;
+  for(let i=0;i<m.length;i++) hash = (hash * 31 + m.charCodeAt(i)) >>> 0;
+  return palette[hash % palette.length];
+}
+
 /* ---------- Total Fleet: fixed value (not pulled from the sheet) ---------- */
 const FIXED_TOTAL_FLEET = 104;
 
@@ -420,6 +518,122 @@ function getManualKpi(key, dateKey){
 }
 function setManualKpi(key, dateKey, value){
   try{ localStorage.setItem('chakra_kpi_' + key + '_' + dateKey, value); }catch(e){}
+}
+
+/* ---------- Depot staff strength (manual, per-date, same pattern as above) ---------- */
+const STAFF_ROLES = [
+  { key:'drivers',     label:'Drivers' },
+  { key:'technicians', label:'Technicians' },
+  { key:'washing',     label:'Washing Team' },
+  { key:'mis',         label:'MIS' },
+  { key:'supervisors', label:'Supervisors' }
+];
+
+function renderStaffKpis(dateKey){
+  const row = document.getElementById('staffKpiRow');
+  if(!row) return;
+  row.innerHTML = STAFF_ROLES.map(role=>{
+    const val = getManualKpi('staff_' + role.key, dateKey);
+    return `<div class="kpi manual staff">
+        <input type="number" min="0" class="val-input" data-staff-role="${role.key}" value="${val}" placeholder="0">
+        <div class="lbl">${role.label} <span class="tag-manual">manual</span></div>
+      </div>`;
+  }).join('');
+  row.querySelectorAll('[data-staff-role]').forEach(inp=>{
+    inp.addEventListener('input', function(){
+      setManualKpi('staff_' + this.dataset.staffRole, dateKey, this.value);
+    });
+  });
+}
+
+/* ---------- Drivers cache (used for the birthday bar AND the spotlight flip card) ---------- */
+let allDrivers = [];
+let driversLoaded = false;
+async function ensureDriversLoaded(){
+  if(driversLoaded) return allDrivers;
+  if(!DRIVERS_SCRIPT_URL || DRIVERS_SCRIPT_URL.indexOf('PASTE_') === 0) return allDrivers;
+  try{
+    const res = await fetch(DRIVERS_SCRIPT_URL + '?action=list');
+    if(res.ok){
+      const data = await res.json();
+      if(Array.isArray(data)){ allDrivers = data; driversLoaded = true; }
+    }
+  }catch(e){ /* silent — spotlight birthdays are a nice-to-have */ }
+  return allDrivers;
+}
+
+/* ---------- On-leave list (manual, per-date, kept in this browser for now) ---------- */
+function getLeaveList(dateKey){
+  try{
+    const raw = localStorage.getItem('chakra_leave_' + dateKey);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+function setLeaveList(dateKey, arr){
+  try{ localStorage.setItem('chakra_leave_' + dateKey, JSON.stringify(arr)); }catch(e){}
+}
+function editLeaveList(dateKey){
+  const current = getLeaveList(dateKey);
+  const input = prompt('Names on leave today (comma separated):', current.join(', '));
+  if(input === null) return;
+  const arr = input.split(',').map(s=>s.trim()).filter(Boolean);
+  setLeaveList(dateKey, arr);
+  renderSpotlight(dateKey);
+}
+
+/* ---------- Spotlight flip card: flips between Birthdays and On Leave every 8s ---------- */
+let spotlightInterval = null;
+function monthDayFromIso(dateKey){
+  const parts = String(dateKey).split('-');
+  if(parts.length !== 3) return null;
+  return { month: Number(parts[1]), day: Number(parts[2]) };
+}
+function renderSpotlight(dateKey){
+  const wrap = document.getElementById('spotlightRow');
+  if(!wrap) return;
+
+  const md = monthDayFromIso(dateKey);
+  const bdayMatches = (md ? allDrivers.filter(d=>{
+    const dob = parseDobToMonthDay(d.dob);
+    return dob && dob.month === md.month && dob.day === md.day;
+  }) : []).map(d=> d.name || d.employee_id || 'Driver');
+
+  const leaveList = getLeaveList(dateKey);
+
+  const frontList = bdayMatches.length
+    ? bdayMatches.map(n=>`<li>🎂 ${n}</li>`).join('')
+    : `<li class="flip-empty">No birthdays today.</li>`;
+  const backList = leaveList.length
+    ? leaveList.map(n=>`<li>🌴 ${n}</li>`).join('')
+    : `<li class="flip-empty">No one on leave today.</li>`;
+
+  wrap.innerHTML = `
+    <div class="flip-card" id="spotlightCard">
+      <div class="flip-card-inner">
+        <div class="flip-face flip-front">
+          <div class="flip-title"><span>🎂 Birthdays Today (${bdayMatches.length})</span></div>
+          <ul class="flip-list">${frontList}</ul>
+          <div class="flip-dots"><span></span><span></span></div>
+        </div>
+        <div class="flip-face flip-back">
+          <div class="flip-title"><span>🌴 On Leave Today (${leaveList.length})</span>
+            <button class="edit-btn" id="editLeaveBtn" type="button">Edit</button>
+          </div>
+          <ul class="flip-list">${backList}</ul>
+          <div class="flip-dots"><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const editBtn = document.getElementById('editLeaveBtn');
+  if(editBtn) editBtn.addEventListener('click', function(e){ e.stopPropagation(); editLeaveList(dateKey); });
+
+  if(spotlightInterval) clearInterval(spotlightInterval);
+  const card = document.getElementById('spotlightCard');
+  spotlightInterval = setInterval(function(){
+    if(card) card.classList.toggle('is-flipped');
+  }, 8000);
 }
 
 /* ---------- shared "which date are we looking at" state ---------- */
@@ -532,6 +746,15 @@ function renderDepot(){
   const groupList = Object.values(groups).sort((a,b)=>
     a.model.localeCompare(b.model) || a.route.localeCompare(b.route) || a.shift.localeCompare(b.shift));
 
+  // Bucket the already-sorted groups by Model so each vehicle type can get
+  // one merged (rowspan) Model cell and a shared colour, like the paper chart.
+  const modelOrder = [];
+  const modelBuckets = {};
+  groupList.forEach(g=>{
+    if(!modelBuckets[g.model]){ modelBuckets[g.model] = []; modelOrder.push(g.model); }
+    modelBuckets[g.model].push(g);
+  });
+
   let totalFleet=0, totalSch=0, totalOps=0, totalSchKms=0, totalOprKms=0;
   let totalTripsSch=0, totalTripsOps=0, totalTripsLoss=0, totalOdoKm=0, totalOdoDiff=0;
   const totalDrivers = new Set();
@@ -541,33 +764,41 @@ function renderDepot(){
       <th>Sch Kms</th><th>Opr Kms</th><th>Loss Kms</th><th>Drivers</th>
     </tr></thead><tbody>`;
 
-  groupList.forEach(g=>{
-    const buses = new Set(g.rows.map(r=>r['Bus No. (With full registration)']).filter(Boolean));
-    const drivers = new Set(g.rows.map(r=>r['Driver ID/Badge No.']).filter(Boolean));
-    const schKms = g.rows.reduce((s,r)=> s + num(r['Schedule Km']), 0);
-    const oprKms = g.rows.reduce((s,r)=> s + num(r['Act. Route Km ']), 0);
-    const ops = g.rows.filter(r=> num(r['Actual Trip']) > 0).length;
-    const sch = g.rows.length;
-    const loss = schKms - oprKms;
+  modelOrder.forEach(model=>{
+    const bucket = modelBuckets[model];
+    const colorClass = modelColorClass(model);
 
-    totalFleet += buses.size; totalSch += sch; totalOps += ops;
-    totalSchKms += schKms; totalOprKms += oprKms;
-    drivers.forEach(d=>totalDrivers.add(d));
+    bucket.forEach((g, idx)=>{
+      const buses = new Set(g.rows.map(r=>r['Bus No. (With full registration)']).filter(Boolean));
+      const drivers = new Set(g.rows.map(r=>r['Driver ID/Badge No.']).filter(Boolean));
+      const schKms = g.rows.reduce((s,r)=> s + num(r['Schedule Km']), 0);
+      const oprKms = g.rows.reduce((s,r)=> s + num(r['Act. Route Km ']), 0);
+      const ops = g.rows.filter(r=> num(r['Actual Trip']) > 0).length;
+      const sch = g.rows.length;
+      const loss = schKms - oprKms;
 
-    g.rows.forEach(r=>{
-      totalTripsSch += num(r['Schedule Trip']);
-      totalTripsOps += num(r['Actual Trip']);
-      totalTripsLoss += num(r['Miss Trip']);
-      totalOdoKm += num(r['Odometer  Diff. Km (B-A)']);
-      totalOdoDiff += num(r['Diffrence']);
-    });
+      totalFleet += buses.size; totalSch += sch; totalOps += ops;
+      totalSchKms += schKms; totalOprKms += oprKms;
+      drivers.forEach(d=>totalDrivers.add(d));
 
-    html += `<tr>
-        <td class="name">${g.model}</td><td>${g.shift}</td><td>${g.route}</td>
+      g.rows.forEach(r=>{
+        totalTripsSch += num(r['Schedule Trip']);
+        totalTripsOps += num(r['Actual Trip']);
+        totalTripsLoss += num(r['Miss Trip']);
+        totalOdoKm += num(r['Odometer  Diff. Km (B-A)']);
+        totalOdoDiff += num(r['Diffrence']);
+      });
+
+      html += `<tr class="${colorClass}">`;
+      if(idx === 0){
+        html += `<td class="name" rowspan="${bucket.length}">${model}</td>`;
+      }
+      html += `<td>${g.shift}</td><td>${g.route}</td>
         <td>${buses.size}</td><td>${sch}</td><td>${ops}</td>
         <td>${schKms.toLocaleString()}</td><td class="auto-val">${oprKms.toLocaleString()}</td>
         <td class="${lossClass(loss)}">${loss.toLocaleString()}</td><td>${drivers.size}</td>
       </tr>`;
+    });
   });
 
   const totalLoss = totalSchKms - totalOprKms;
@@ -612,6 +843,9 @@ function renderDepot(){
   const accidentInput = document.getElementById('kpiAccident');
   if(breakdownInput) breakdownInput.addEventListener('input', function(){ setManualKpi('breakdown', dateKey, this.value); });
   if(accidentInput) accidentInput.addEventListener('input', function(){ setManualKpi('accident', dateKey, this.value); });
+
+  renderStaffKpis(dateKey);
+  renderSpotlight(dateKey);
 }
 
 /* ==========================================================================
